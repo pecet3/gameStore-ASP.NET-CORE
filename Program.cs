@@ -42,7 +42,7 @@ app.MapGet("/games/{id}", (int id) =>
 
     if (game is null)
     {
-        return Results.NotFound(("not found any record with id: ", id));
+        return Results.NotFound();
     }
 
     return Results.Ok(game);
@@ -62,13 +62,27 @@ app.MapPut("/games/{id}", (int id, Game updatedGame) =>
 
     if (existingGame is null)
     {
-        return Results.NotFound(("not found any record with id: ", id));
+        return Results.NotFound();
     }
 
     existingGame.Name = updatedGame.Name;
     existingGame.Genre = updatedGame.Genre;
     existingGame.Price = updatedGame.Price;
     existingGame.RealseDate = updatedGame.RealseDate;
+
+    return Results.NoContent();
+});
+
+app.MapDelete("/games/{id}", (int id) =>
+{
+    Game? existingGame = games.Find(game => game.Id == id);
+
+    if (existingGame is null)
+    {
+        return Results.NotFound();
+    }
+
+    games.Remove(existingGame);
 
     return Results.NoContent();
 });
