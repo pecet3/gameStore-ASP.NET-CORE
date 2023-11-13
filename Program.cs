@@ -1,6 +1,8 @@
 
 using GameStore.Api.Entities;
 
+const string GetGameEndpointGame = "GetGame";
+
 List<Game> games = new()
 {
     new Game(){
@@ -33,5 +35,42 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 app.MapGet("/games", () => games);
+
+app.MapGet("/games/{id}", (int id) =>
+{
+    Game? game = games.Find(game => game.Id == id);
+
+    if (game is null)
+    {
+        return Results.NotFound(("not found any record with id: ", id));
+    }
+
+    return Results.Ok(game);
+}).WithName(GetGameEndpointGame);
+
+app.MapPost("/games", (Game game) =>
+{
+    game.Id = games.Max(game => game.Id) + 1;
+    games.Add(game);
+
+    return Results.CreatedAtRoute(GetGameEndpointGame, new { id = game.Id }, game);
+});
+
+app.MapPut("/games/{id}", (int id, Game updatedGame) =>
+{
+    Game? existingGame = games.Find(game => game.Id == id);
+
+    if (existingGame is null)
+    {
+        return Results.NotFound(("not found any record with id: ", id));
+    }
+
+    existingGame.Name = updatedGame.Name;
+    existingGame.Genre = updatedGame.Genre;
+    existingGame.Price = updatedGame.Price;
+    existingGame.RealseDate = updatedGame.RealseDate;
+
+    return Results.NoContent();
+});
 
 app.Run();
