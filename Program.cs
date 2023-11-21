@@ -33,8 +33,10 @@ List<Game> games = new()
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
-var gamesGroup = app.MapGroup("/games");
-gamesGroup.MapGet("/s", () => games);
+
+var gamesGroup = app.MapGroup("/games").WithParameterValidation();
+
+gamesGroup.MapGet("/", () => games);
 
 gamesGroup.MapGet("/{id}", (int id) =>
 {
